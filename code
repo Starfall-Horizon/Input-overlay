@@ -1,0 +1,167 @@
+// ==UserScript==
+// @name         kkey
+// @namespace    http://tampermonkey.net/
+// @version      2.2
+// @description  jqqck
+// @match        https://narrow.one/*
+// @author       Starfall and Shoe
+// @grant        none
+// ==/UserScript==
+
+const overlay = document.createElement('div');
+overlay.style.position = 'fixed';
+overlay.style.bottom = '5px';
+overlay.style.left = '10px';
+overlay.style.zIndex = "69420";
+overlay.style.pointerEvents = "none";
+document.body.appendChild(overlay);
+
+const keys = {};
+
+const defaultSettings = {
+    keyWidth: 50,
+    keyHeight: 50,
+    textOpacity: 100,
+    tabKeyWidth: 60,
+    tabKeyHeight: 50,
+    tabTextOpacity: 100,
+    spaceKeyWidth: 200,
+    spaceKeyHeight: 50,
+    spaceTextOpacity: 100,
+    showKeys: true,
+    row1X: -100,
+    row1Y: -10,
+    row2X: 59,
+    row2Y: 1,
+    row3X: -63,
+    row3Y: 0,
+};
+
+const settings = JSON.parse(localStorage.getItem('keyboardOverlaySettings')) || defaultSettings;
+
+const saveSettings = () => {
+    localStorage.setItem('keyboardOverlaySettings', JSON.stringify(settings));
+};
+
+const getRandomSeed = () => Math.floor(Math.random() * 99999) + 1;
+
+const applyWrinkledPaperStyle = (keyDiv) => {
+    keyDiv.style.setProperty('--wrinkled-paper-border-segments', '0.035');
+    keyDiv.style.setProperty('--wrinkled-paper-wrinkle-size', '4px');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-count-min', '0.001');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-count-max', '0.002');
+    keyDiv.style.setProperty('--wrinkled-paper-border-size', '3');
+    keyDiv.style.setProperty('--wrinkled-paper-border-size-bottom', '5');
+    keyDiv.style.setProperty('--wrinkled-paper-border-color', 'var(--button-on-clear-bg-wrinkled-paper-border-color, #242424)');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-depth-min', '5px');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-depth-max', '10px');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-width-min', '5px');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-width-max', '15px');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-angle-offset-min', '0.7');
+    keyDiv.style.setProperty('--wrinkled-paper-tear-angle-offset-max', '1.1');
+};
+
+const createKey = (key, width, height, keyName) => {
+    const keyDiv = document.createElement('button');
+    keyDiv.classList.add("wrinkledPaper");
+    keyDiv.style.width = `${width}`;
+    keyDiv.style.height = `${height}`;
+    keyDiv.style.display = 'inline-flex';
+    keyDiv.style.alignItems = 'center';
+    keyDiv.style.justifyContent = 'center';
+    keyDiv.style.margin = '4px';
+    keyDiv.style.borderRadius = '4px';
+    keyDiv.style.transition = 'filter 0s, opacity 0s';
+    keyDiv.style.border = 'none';
+    keyDiv.style.opacity = '1';
+    keyDiv.style.setProperty('--wrinkled-paper-seed', getRandomSeed());
+    applyWrinkledPaperStyle(keyDiv);
+
+    const keyText = document.createElement('span');
+    keyText.innerText = keyName ?? key;
+    keyText.style.color = "white";
+    keyText.style.fontSize = "28px";
+    keyText.style.fontFamily = "blueNight";
+    keyText.style.opacity = `${settings.textOpacity / 100}`;
+    keyText.style.webkitTextStroke = '1px black';
+    keyDiv.appendChild(keyText);
+
+    keys[key] = { keyDiv, keyText };
+    return keyDiv;
+};
+
+const row1 = document.createElement('div');
+row1.style.display = 'flex';
+row1.style.justifyContent = 'flex-start';
+row1.style.position = 'relative';
+row1.appendChild(createKey('tab', `${settings.tabKeyWidth}px`, `${settings.tabKeyHeight}px`, 'tab'));
+row1.appendChild(createKey('q'));
+row1.appendChild(createKey('w'));
+row1.appendChild(createKey('e'));
+row1.appendChild(createKey('t'));
+row1.appendChild(createKey('y'));
+overlay.appendChild(row1);
+
+const row2 = document.createElement('div');
+row2.style.display = 'flex';
+row2.style.justifyContent = 'flex-start';
+row2.style.position = 'relative';
+row2.style.left = '0px';
+row2.appendChild(createKey('a'));
+row2.appendChild(createKey('s'));
+row2.appendChild(createKey('d'));
+overlay.appendChild(row2);
+
+const row3 = document.createElement('div');
+row3.style.display = 'flex';
+row3.style.justifyContent = 'center';
+row3.style.position = 'relative';
+row3.style.left = '-0px';
+row3.appendChild(createKey('Space', `${settings.spaceKeyWidth}px`, `${settings.spaceKeyHeight}px`, 'space'));
+overlay.appendChild(row3);
+
+Object.keys(keys).forEach((key) => {
+    if (key === 'tab') {
+        keys[key].keyDiv.style.width = `${settings.tabKeyWidth}px`;
+        keys[key].keyDiv.style.height = `${settings.tabKeyHeight}px`;
+        keys[key].keyText.style.opacity = `${settings.tabTextOpacity / 100}`;
+    } else if (key === 'Space') {
+        keys[key].keyDiv.style.width = `${settings.spaceKeyWidth}px`;
+        keys[key].keyDiv.style.height = `${settings.spaceKeyHeight}px`;
+        keys[key].keyText.style.opacity = `${settings.spaceTextOpacity / 100}`;
+    } else {
+        keys[key].keyDiv.style.width = `${settings.keyWidth}px`;
+        keys[key].keyDiv.style.height = `${settings.keyHeight}px`;
+        keys[key].keyText.style.opacity = `${settings.textOpacity / 100}`;
+    }
+});
+
+row1.style.left = `${settings.row1X}px`;
+row1.style.top = `${settings.row1Y}px`;
+
+row2.style.left = `${settings.row2X}px`;
+row2.style.top = `${settings.row2Y}px`;
+
+row3.style.left = `${settings.row3X}px`;
+row3.style.top = `${settings.row3Y}px`;
+
+window.addEventListener('keydown', (event) => {
+    const key = event.key === ' ' ? 'Space' : event.key;
+    if (key === 'Tab') {
+        event.preventDefault();
+    }
+    if (keys[key]) {
+        const { keyDiv, keyText } = keys[key];
+        keyDiv.style.filter = 'brightness(0.7)';
+        keyText.style.opacity = `${Math.max(0.6, settings.textOpacity / 100)}`;
+    }
+});
+
+window.addEventListener('keyup', (event) => {
+    const key = event.key === ' ' ? 'Space' : event.key;
+    if (keys[key]) {
+        const { keyDiv, keyText } = keys[key];
+        keyDiv.style.filter = '';
+        keyText.style.opacity = `${settings.textOpacity / 100}`;
+    }
+});
