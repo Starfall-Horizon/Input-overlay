@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         kkey
+// @name         Input Overlay
 // @namespace    http://tampermonkey.net/
 // @version      2.2
-// @description  jqqck
+// @description  pew
 // @match        https://narrow.one/*
-// @author       Starfall and Shoe
+// @author       Starfall (and Shoe)
 // @grant        none
 // ==/UserScript==
 
