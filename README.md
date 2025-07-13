@@ -10,6 +10,6 @@ Click on extensions > Tampermonkey > Create a new script
 
 Delete starting chunk of code
 
-Copy and paste the code into Tampermonkey
+Copy and paste the [code](https://github.com/Starfall-Horizon/Input-overlay/blob/input-overlay/code) into Tampermonkey
 
 Visit [Narrow One](https://narrow.one).
